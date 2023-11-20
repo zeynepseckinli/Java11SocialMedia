@@ -1,9 +1,6 @@
 package com.zeynep.controller;
 
-import com.zeynep.dto.request.ActivationRequestDto;
-import com.zeynep.dto.request.LoginRequestDto;
-import com.zeynep.dto.request.RegisterRequestDto;
-import com.zeynep.dto.request.UserUpdateRequestDto;
+import com.zeynep.dto.request.*;
 import com.zeynep.dto.response.RegisterResponseDto;
 import com.zeynep.repository.entity.Auth;
 import com.zeynep.service.AuthService;
@@ -80,6 +77,11 @@ public class AuthController {
     @PostMapping(UPDATE)
     public ResponseEntity<Boolean> updateUser(UserUpdateRequestDto dto){
         return ResponseEntity.ok(authService.updateUser(dto));
+    }
+
+    @PutMapping("/update_email_or_username")//update metotlarında kullanılır
+    public ResponseEntity<Boolean> updateEmailOrUsername(@RequestBody UpdateEmailOrUsernameRequestDto dto){
+        return ResponseEntity.ok(authService.updateEmailOrUsername(dto));
     }
 
 }

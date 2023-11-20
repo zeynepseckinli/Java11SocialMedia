@@ -18,5 +18,4 @@ public class UserUpdateRequestDto {
     private String avatarUrl;
     private String address;
     private String about;
-    private EStatus status;
 }

@@ -12,7 +12,6 @@ import com.zeynep.utility.CodeGenerator;
 import com.zeynep.utility.JwtTokenManager;
 import com.zeynep.utility.ServiceManager;
 import com.zeynep.utility.enums.EStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -80,8 +79,16 @@ public class AuthService extends ServiceManager<Auth, Long>{
             throw new AuthManagerException(ErrorType.USER_NOT_FOUND);
         }
         return userManager.updateUser(dto);
+    }
 
-
-
+    public Boolean updateEmailOrUsername(UpdateEmailOrUsernameRequestDto dto) {
+        Optional<Auth> auth = authRepository.findById(dto.getId());
+        if (auth.isEmpty()){
+            throw new AuthManagerException(ErrorType.USER_NOT_FOUND);
+        }
+        auth.get().setUsername(dto.getUsername());
+        auth.get().setEmail(dto.getEmail());
+        update(auth.get());
+        return true;
     }
 }

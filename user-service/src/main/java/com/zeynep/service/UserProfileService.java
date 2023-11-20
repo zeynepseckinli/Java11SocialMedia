@@ -1,13 +1,16 @@
 package com.zeynep.service;
 
 import com.zeynep.dto.request.ActivateStatusRequestDto;
+import com.zeynep.dto.request.UpdateEmailOrUsernameRequestDto;
 import com.zeynep.dto.request.UserCreateRequestDto;
 import com.zeynep.dto.request.UserUpdateRequestDto;
 import com.zeynep.exception.ErrorType;
 import com.zeynep.exception.UserManagerException;
+import com.zeynep.manager.AuthManager;
 import com.zeynep.mapper.UserMapper;
 import com.zeynep.repository.UserRepository;
 import com.zeynep.repository.entity.UserProfile;
+import com.zeynep.utility.JwtTokenManager;
 import com.zeynep.utility.ServiceManager;
 import com.zeynep.utility.enums.EStatus;
 import org.springframework.stereotype.Service;
@@ -18,9 +21,14 @@ import java.util.Optional;
 public class UserProfileService extends ServiceManager<UserProfile,Long> {
 
     private final UserRepository userRepository;
-    public UserProfileService(UserRepository userRepository) {
+    private final JwtTokenManager tokenManager;
+    private final AuthManager authManager;
+
+    public UserProfileService(UserRepository userRepository, JwtTokenManager tokenManager, AuthManager authManager) {
         super(userRepository);
         this.userRepository=userRepository;
+        this.tokenManager = tokenManager;
+        this.authManager = authManager;
     }
 
     public Boolean createUser(UserCreateRequestDto dto){
@@ -61,5 +69,33 @@ public class UserProfileService extends ServiceManager<UserProfile,Long> {
         } catch (Exception e){
             throw new UserManagerException(ErrorType.USER_NOT_FOUND);
         }
+    }
+
+    public Boolean update(UserUpdateRequestDto dto){
+        Optional<Long> authId = tokenManager.getIdFromToken(dto.getToken());
+        if (authId.isEmpty()){
+            throw new UserManagerException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> userProfile = userRepository.findOptionalByAuthId(authId.get());
+        if (userProfile.isEmpty()){
+            throw new UserManagerException(ErrorType.USER_NOT_FOUND);
+        }
+        //auth isteği yolla
+        if (!dto.getUsername().equals(userProfile.get().getUsername())|| !dto.getEmail().equals(userProfile.get().getEmail())){
+            userProfile.get().setUsername(dto.getUsername());
+            userProfile.get().setEmail(dto.getEmail());
+            UpdateEmailOrUsernameRequestDto updateEmailOrUsernameRequestDto = UpdateEmailOrUsernameRequestDto.builder()
+                    .username(userProfile.get().getUsername())
+                    .email(userProfile.get().getEmail())
+                    .id(userProfile.get().getAuthId())
+                    .build();
+            authManager.updateEmailOrUsername(updateEmailOrUsernameRequestDto);
+        }
+        userProfile.get().setPhone(dto.getPhone());
+        userProfile.get().setAvatarUrl(dto.getAvatarUrl());
+        userProfile.get().setAddress(dto.getAddress());
+        userProfile.get().setAbout(dto.getAbout());
+        update(userProfile.get());
+        return true;
     }
 }

@@ -1,6 +1,5 @@
 package com.zeynep.dto.request;
 
-import com.zeynep.utility.enums.EStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,13 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserUpdateRequestDto {
-    private String token;
+public class UpdateEmailOrUsernameRequestDto {
+
+    private Long id;
     private String username;
     private String email;
-    private String phone;
-    private String avatarUrl;
-    private String address;
-    private String about;
 
 }

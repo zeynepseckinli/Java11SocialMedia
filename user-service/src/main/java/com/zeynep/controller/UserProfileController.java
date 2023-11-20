@@ -4,6 +4,7 @@ import com.zeynep.dto.request.ActivateStatusRequestDto;
 import com.zeynep.dto.request.UserCreateRequestDto;
 import com.zeynep.dto.request.UserUpdateRequestDto;
 import com.zeynep.service.UserProfileService;
+import com.zeynep.utility.JwtTokenManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,10 @@ public class UserProfileController {
     @PostMapping(UPDATE)
     public ResponseEntity<Boolean> updateUser(@RequestBody UserUpdateRequestDto dto){
         return ResponseEntity.ok(userProfileService.updateUser(dto));
+    }
+    @PostMapping(UPDATE+"/2")
+    public ResponseEntity<Boolean> updateUser2(@RequestBody UserUpdateRequestDto dto){
+        return ResponseEntity.ok(userProfileService.update(dto));
     }
 
 }
